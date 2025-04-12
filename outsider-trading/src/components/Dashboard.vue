@@ -4,10 +4,12 @@
         <div class="row d-none d-md-flex h-100">
             <!--Chat history-->
             <div class="col-md-2 bg-light border-end">
-                <div class="chat-history" style="height: 100%; overflow-y: scroll;">
+                <div class="chat-history pt-3 pb-3" style="height: 100%; overflow-y: scroll;">
                     <!--Example messages-->
-                    <div class="message desktop-message">
-                        <p><strong>Melon Husk:</strong> I hate $MDGT stock. I am going to nuke Mars now.</p>
+                    <div v-for="(post, index) in posts" :key="index">
+                        <div class="speech-bubble">
+                            <p><strong>{{ post.poster }}: </strong>{{ post.message }}</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -69,7 +71,24 @@ export default {
     },
     data() {
         return {
-            showChat: true
+            showChat: true,
+            posts: []
+        };
+    },
+    mounted() {
+        const socket = new WebSocket('ws://10.32.254.39:8219/user');
+
+        socket.onopen = () => {
+            console.log('Websocket connection established');
+        };
+
+        socket.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+
+            if (message.posts) {
+                this.posts = message.posts;
+            }
+            console.log("Posts Updated")
         };
     }
 };
