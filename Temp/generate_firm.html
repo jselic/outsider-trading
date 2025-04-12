@@ -1,0 +1,74 @@
+<body>
+
+    <form id="company-form">
+      <label for="company-name">Name of Company:</label>
+      <input type="text" id="company-name" name="company-name" required><br><br>
+  
+      <label for="stock-tag">Stock Market Tag (e.g., $AAPL):</label>
+      <input type="text" id="stock-tag" name="stock-tag" required><br><br>
+  
+      <label for="description">Short Description of What We Do:</label>
+      <textarea id="description" name="description" required></textarea><br><br>
+  
+      <label for="generate-toggle">
+        <input type="checkbox" id="generate-toggle"> Generate Randomly
+      </label><br><br>
+  
+      <button type="submit" id="submit-button">Send</button>
+    </form>
+
+    <div id="response"></div>
+  
+    <script>
+        const generateToggle = document.getElementById('generate-toggle');
+        const companyName = document.getElementById('company-name');
+        const stockTag = document.getElementById('stock-tag');
+        const description = document.getElementById('description');
+        const submitButton = document.getElementById('submit-button');
+      
+        function toggleFormState() {
+          const isChecked = generateToggle.checked;
+          companyName.disabled = isChecked;
+          stockTag.disabled = isChecked;
+          description.disabled = isChecked;
+          submitButton.textContent = isChecked ? 'Generate' : 'Send';
+        }
+      
+        generateToggle.addEventListener('change', toggleFormState);
+      
+        toggleFormState();
+
+        const preamble_gen = "Return a different response each time I prompt you. Generate a funny but subtle tech startup company name and a two sentence description of it. Return the response in a json format with tags companyName, companyDescription and stockTag. Return nothing else, no other text.";
+        const preamble_company = "Generate a tech company logo based on the following company name and description: "
+        document.getElementById('company-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            if(generateToggle.checked){
+                fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyDiRsMHgut-uLV1AYWqVknGCiX91yHH-r4", {
+                    method: "POST",
+                    headers: {
+                    "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                    contents: [{
+                        parts: [{ text: preamble_gen}]
+                    }]
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
+                    document.getElementById('company-name').textContent = text
+                    document.getElementById('response').textContent = text;
+                })
+                .catch(error => {
+                    document.getElementById('response').textContent = 'Error: ' + error;
+                });
+            } else {
+
+            }
+          
+        });
+    </script>
+  
+  </body>

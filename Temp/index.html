@@ -1,0 +1,38 @@
+<body>
+    <form id="tweet" name="tweet">
+        <label for="textfield">Spew Disinformation:</label>
+        <input type="text" id="textfield" name="textfield" cols="60" rows="10">
+        <button type="submit">Send</button>
+    </form>
+    <div id="response">
+
+    </div>
+    <script>
+        const preamble = "You are a master trading agent using a complex algorith to determine the following attributes of a tweet: The attributes are: Stability, Hype, Woke, Based, Cringe, Corporate newspeak and Despair. Rate each of those attributes from 0 to 1, with zero being the lowest, and one being the highest possible. Your response should be in the following format: 'attribute name: score' for each of the attributes. Nothing else. This is the tweet: \n"
+        document.getElementById('tweet').addEventListener('submit', function(event) {
+          event.preventDefault();
+    
+          const inputText = document.getElementById('textfield').value;
+    
+          fetch("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyDiRsMHgut-uLV1AYWqVknGCiX91yHH-r4", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{ text: preamble + inputText }]
+              }]
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response.";
+            document.getElementById('response').textContent = text;
+          })
+          .catch(error => {
+            document.getElementById('response').textContent = 'Error: ' + error;
+          });
+        });
+      </script>
+</body>
