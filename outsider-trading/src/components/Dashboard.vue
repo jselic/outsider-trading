@@ -20,8 +20,10 @@
                     </div>
                     <div class="col-12 d-flex align-items-center" style="height: 20%;">
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Type a message..." />
-                            <button class="btn btn-primary">Spew Disinformation</button>
+                            <input type="text" class="form-control rounded-pill" placeholder="Spew Disinformation..." />
+                            <button class="btn btn-primary rounded-circle ms-2">
+                                <i class="fa fa-arrow-right"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
