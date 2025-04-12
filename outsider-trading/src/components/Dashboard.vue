@@ -16,6 +16,7 @@
                 <div class="row h-100">
                     <div class="col-12 d-flex align-items-center" style="height: 80%;">
                         <!--Stock graph will go here-->
+                        <StockChart style="width: 100%; height: 100%;"/>
                     </div>
                     <div class="col-12 d-flex align-items-center" style="height: 20%;">
                         <div class="input-group">
@@ -58,11 +59,16 @@
 </template>
 
 <script>
+import StockChart from './StockChart.vue'
+
 export default {
-  data() {
-    return {
-      showChat: true
-    };
-  }
+    components: {
+        StockChart
+    },
+    data() {
+        return {
+            showChat: true
+        };
+    }
 };
 </script>
