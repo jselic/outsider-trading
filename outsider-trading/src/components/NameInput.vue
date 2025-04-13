@@ -12,7 +12,7 @@
           @keyup.enter="goNext"
           type="text"
           class="form-control form-control-lg rounded-pill pe-5"
-          placeholder="Enter your screen name"
+          placeholder="Enter your alias"
         />
         <button id="login-next-button" class="btn btn-primary position-absolute end-0 top-50 translate-middle-y me-2 rounded-circle d-flex align-items-center justify-content-center" @click="goNext">
           <span class="fa fa-arrow-right"></span>

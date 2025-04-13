@@ -4,7 +4,7 @@
 
 <script>
 import {Chart} from 'chart.js/auto'
-import data from '../../public/test_data.json'
+//import data from '../../public/test_data.json'
 
 export default {
     mounted() {
@@ -22,13 +22,13 @@ export default {
         const chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: [],
-                datasets: data.companies.map(company => ({
-                    label: '',
-                    data: [],
-                    borderColor: getRandomColor(),
-                    tension: 0.3
-                }))
+                //labels: [],
+                //datasets: data.companies.map(company => ({
+                //    label: '',
+                //    data: [],
+                //    borderColor: getRandomColor(),
+                //    tension: 0.3
+                //}))
             },
             options: {
                 responsive: true,
@@ -53,12 +53,19 @@ export default {
                 })
             }
         
-            chart.data.datasets = message.companies.map(company => ({
-                label: company.id,
-                data: company.performance.lastValues,
-                borderColor: companyColors[company.id],
-                tension: 0.3
-            }))
+            message.companies.forEach(company => {
+                const dataset = chart.data.datasets.find(d => d.label === company.id);
+                if (dataset) {
+                    dataset.data.push(company.performance.currentValue);
+                } else {
+                    chart.data.datasets.push({
+                        label: company.id,
+                        data: [company.performance.currentValue],
+                        borderColor: companyColors[company.id],
+                        tension: 0.3
+                    });
+                }
+            });
 
             const newData = message.companies[0].performance.lastValues
             chart.data.labels = newData.map((_, i) => i + 1)
