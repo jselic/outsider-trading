@@ -3,7 +3,7 @@
         <!--Desktop layout-->
         <div class="row d-none d-md-flex h-100">
             <!--Chat history-->
-            <div class="col-md-2 bg-light border-end">
+            <div class="col-md-2 bg-light border-end d-flex flex-column h-100">
                 <div class="chat-history pt-3 pb-3" style="height: 100%; overflow-y: scroll;">
                     <!--Example messages-->
                     <div v-for="(post, index) in posts" :key="index">
@@ -14,19 +14,17 @@
                 </div>
             </div>
             <!--Graph Area-->
-            <div class="col-md-10">
-                <div class="row h-100">
-                    <div class="col-12 d-flex align-items-center" style="height: 80%;">
-                        <!--Stock graph will go here-->
-                        <StockChart style="width: 100%; height: 100%;"/>
-                    </div>
-                    <div class="col-12 d-flex align-items-center" style="height: 20%;">
-                        <div class="input-group">
-                            <input type="text" class="form-control rounded-pill" placeholder="Spew Disinformation..." />
-                            <button class="btn btn-primary rounded-circle ms-2">
-                                <i class="fa fa-arrow-right"></i>
-                            </button>
-                        </div>
+            <div class="col-md-10 d-flex flex-column h-100">
+                <div class="col-12 d-flex align-items-center" style="height: 80%;">
+                    <!--Stock graph will go here-->
+                    <StockChart style="width: 100%; height: 100%;"/>
+                </div>
+                <div class="flex-shrink-0 d-flex align-items-center" style="height: 20%;">
+                    <div class="input-group w-100">
+                        <input id="new_tweet" type="text" class="form-control rounded-pill" v-model="newMessage" placeholder="Spew Disinformation..." @keyup.enter="postMessage" />
+                        <button class="btn btn-primary rounded-circle ms-2" @click="postMessage">
+                            <i class="fa fa-arrow-right"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -64,6 +62,7 @@
 
 <script>
 import StockChart from './StockChart.vue'
+import Cookies from 'js-cookie'
 
 export default {
     components: {
@@ -72,11 +71,14 @@ export default {
     data() {
         return {
             showChat: true,
-            posts: []
+            posts: [],
+            postSocket: null,
+            newMessage: ''
         };
     },
     mounted() {
         const socket = new WebSocket('ws://10.32.254.39:8219/user');
+        this.postSocket = new WebSocket('ws://10.32.254.39:8219/post');
 
         socket.onopen = () => {
             console.log('Websocket connection established');
@@ -90,6 +92,34 @@ export default {
             }
             console.log("Posts Updated")
         };
+    },
+    methods: {
+        async postMessage() {
+            if(!this.newMessage.trim()) return;
+
+            const messagePayload = {
+                poster: Cookies.get('screen_name'),
+                message: this.newMessage
+            }
+
+            try {
+                const response = await fetch('http://10.32.254.39:8219/post', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(messagePayload)
+                });
+
+                if (response.ok) {
+                    this.newMessage = '';
+                } else {
+                    console.error('Failed to post message:', await response.text());
+                }
+            } catch (error) {
+                console.error('Error posting message: ', error);
+            }
+        }
     }
 };
 </script>
