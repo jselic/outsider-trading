@@ -22,10 +22,10 @@ export default {
         const chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: data.companies[0].performance.lastValues.map((_, i) => i + 1),
+                labels: [],
                 datasets: data.companies.map(company => ({
-                    label: company.id,
-                    data: company.performance.lastValues,
+                    label: '',
+                    data: [],
                     borderColor: getRandomColor(),
                     tension: 0.3
                 }))

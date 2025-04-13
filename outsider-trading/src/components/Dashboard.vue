@@ -1,5 +1,51 @@
 <template>
     <div class="container-fluid vh-100">
+        <!--MObile Toggle-->
+        <div class="row d-flex d-md-none">
+            <div class="col-12">
+                <div class="btn-group w-100" role="group">
+                    <button type="button"
+                            class="btn"
+                            :class="showChatHistory ? 'btn-secondary' : 'btn-outline-secondary'"
+                            @click="showChatHistory = true">
+                        Chat
+                    </button>
+                    <button type="button"
+                            class="btn"
+                            :class="!showChatHistory ? 'btn-secondary' : 'btn-outline-secondary'"
+                            @click="showChatHistory = false">
+                        Chart
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!--Mobile layout-->
+        <div class="row d-flex d-md-none h-100">
+            <div class="col-12 d-flex flex-column h-100">
+                <div class="flex-grow-1 overflow-auto" v-if="showChatHistory">
+                    <!-- Chat history -->
+                    <div class="chat-history p-3">
+                        <div v-for="(post, index) in posts" :key="index">
+                            <div class="speech-bubble">
+                                <p><strong>{{ post.poster }}: </strong>{{ post.message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-grow-1 overflow-auto" v-else>
+                    <!-- Stock chart -->
+                    <StockChart style="width: 100%; height: 100%;" />
+                </div>
+                <div class="flex-shrink-0 d-flex align-items-center p-2">
+                    <div class="input-group w-100">
+                        <input id="new_tweet" type="text" class="form-control rounded-pill" v-model="newMessage" placeholder="Spew Disinformation..." @keyup.enter="postMessage" />
+                        <button class="btn btn-primary rounded-circle ms-2" @click="postMessage">
+                            <i class="fa fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!--Desktop layout-->
         <div class="row d-none d-md-flex h-100">
             <!--Chat history-->
@@ -29,35 +75,7 @@
                 </div>
             </div>
         </div>
-        <!--Mobile Layout-->
-        <div class="d-md-none position-relative" style="height: 100%;">
-            <!--Slider toggle between chat history and stock graph-->
-            <div class="position-absolute top-0 start-0 w-100" style="height: 85%; padding:10px">
-                <div class="btn-group w-100" role="group" aria-label="Toggle between Chat and Stocks">
-                    <button type="button" class="btn btn-secondary w-50" @click="showChat = true">Chat</button>
-                    <button type="button" class="btn btn-secondary w-50" @click="showChat = false">Stocks</button>
-                </div>
-
-                <div id="mobile-chat" v-if="showChat" style="height: 100%; overflow-y: scroll;">
-                    <!--Chats go here-->
-                    <div class="message">
-                        <p><strong>Kradislav Uzmič:</strong>$THFT is surging today. Truly a miraculous time to BUY!</p>
-                    </div>
-                </div>
-                <div id="mobile-stonks" v-else style="height: 100%; background-color: #f0f0f0;">
-                    <p>Stock Graph Placeholder</p>
-                </div>
-            </div>
-            <!--Text prompt statinoary-->
-            <div class="position-absolute bottom-0 start-0 w-100 p-2 flex flex-column" style="height: 15%; padding: 10px;">
-                <div class="input-group mt-auto">
-                    <input type="text" class="form-control" placeholder="Spew Disinformation">
-                    <button class="btn btn-primary"><span class="fa fa-arrow-right"></span></button>
-                </div>
-            </div>
-        </div>
     </div>
-
 </template>
 
 <script>
@@ -70,7 +88,7 @@ export default {
     },
     data() {
         return {
-            showChat: true,
+            showChatHistory: true,
             posts: [],
             postSocket: null,
             newMessage: ''
