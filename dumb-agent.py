@@ -2,6 +2,7 @@ from google import genai
 import json
 import websocket
 import random
+import numpy as np
 # {
 #   "type": "state",
 #   "companies": { //map id -> company
@@ -28,24 +29,27 @@ def smartAgent(serverResponse):
 	data=json.loads(serverResponse)
 	companies=data["companies"]
 	posts=data["posts"]
-	prompt="You are a master stock trading agent. You must rank the companies based on their previous performance, description and social media posts. Using a complex algorith you must determine the following attributes of each company stock: Stability, Hype, Woke, Based, Cringe, Corporate newspeak and Despair. Rate each of those attributes from 0 to 1, with zero being the lowest, and one being the highest possible. Your response should be in the following json format: 'companyID:[list of all attributes in the format of attribute name: score]' for each of the attributes. Nothing else. This is the data from companies: \n" + json.dumps(companies) + "And these are the social media posts: \n" + json.dumps(posts)
+	prompt="You are a master stock trading agent. You must rank the companies based on social media posts about them. Using a complex algorith you must determine the following attributes of each company stock: Good and Bad. Rate each of those attributes from 0 to 1, with zero being the lowest, and one being the highest possible. Your response should be in the following json format: 'companyID:[list of all attributes in the format of attribute name: score]' for each of the attributes. Nothing else. This is the data from companies: \n" + json.dumps(companies) + "And these are the social media posts: \n" + json.dumps(posts)
 
-	client=genai.Client(api_key="AIzaSyBRYe_6Muj9Verk09P9TX-OEZuxnRmcxck")
+	client=genai.Client(api_key="AIzaSyDiRsMHgut-uLV1AYWqVknGCiX91yHH-r4")
 	response=client.models.generate_content(model="gemini-2.0-flash-lite", contents=prompt)
 	cleanJson=response.text.removeprefix("```json\n").removesuffix("```")
+	print(cleanJson)
 	allAgentResponses=[]
-	allAgentResponses.append(doomerAgent(cleanJson))
-	allAgentResponses.append(corpoAgent(cleanJson))
-	allAgentResponses.append(zoomerAgent(cleanJson))
-	allAgentResponses.append(standardAgent(cleanJson))
+	#allAgentResponses.append(doomerAgent(cleanJson))
+	#allAgentResponses.append(corpoAgent(cleanJson))
+	#allAgentResponses.append(zoomerAgent(cleanJson))
 	allAgentResponses.append(wallStreetBetsAgent(companies))
+	allAgentResponses.append(standardAgent(cleanJson))
+	allAgentResponses.append(standardAgent(cleanJson))
+	allAgentResponses.append(standardAgent(cleanJson))
+	allAgentResponses.append(standardAgent(cleanJson))
 
 	decisions={"decisions":allAgentResponses}
 	return json.dumps(decisions)
 
 
 # {
-#   "type": "decisions",
 #   "decisions": [ //seznam mapov odgovorv agentov
 #     {
 #       "$TSLA": "HOLD",
@@ -60,11 +64,11 @@ def doomerAgent(companyList):
 	responseList={}
 	for company in companyDict:
 		if companyDict[company]["Despair"]>0.7:
-			responseList[company]="BUY"
+			responseList[company]=np.random.choice(["BUY", "HOLD"],p=[0.7,0.3])
 		elif companyDict[company]["Despair"]>0.5:
-			responseList[company]="HOLD"
+			responseList[company]=np.random.choice(["BUY", "HOLD","SELL"],p=[0.2,0.5,0.3])
 		else:
-			responseList[company]="SELL"
+			responseList[company]=np.random.choice(["SELL", "HOLD"],p=[0.6,0.4])
 	return responseList
 
 def corpoAgent(companyList):
@@ -72,11 +76,11 @@ def corpoAgent(companyList):
 	responseList={}
 	for company in companyDict:
 		if companyDict[company]["Corporate newspeak"]>0.7:
-			responseList[company]="BUY"
+			responseList[company]=np.random.choice(["BUY", "HOLD"],p=[0.7,0.3])
 		elif companyDict[company]["Corporate newspeak"]>0.5:
-			responseList[company]="HOLD"
+			responseList[company]=np.random.choice(["BUY", "HOLD"],p=[0.5,0.5])
 		else:
-			responseList[company]="SELL"
+			responseList[company]=np.random.choice(["BUY", "HOLD","SELL"],p=[0.3,0.4,0.3])
 	return responseList
 
 def wallStreetBetsAgent(companyList):
@@ -97,25 +101,26 @@ def zoomerAgent(companyList):
 	responseList={}
 	for company in companyDict:
 		if companyDict[company]["Cringe"]>0.5 or companyDict[company]["Based"]>0.5:
-			responseList[company]="BUY"
+			responseList[company]=np.random.choice(["BUY", "HOLD"],p=[0.7,0.3])
 		elif companyDict[company]["Cringe"]>0.3 or companyDict[company]["Based"]>0.3:
-			responseList[company]="HOLD"
+			responseList[company]=np.random.choice(["BUY", "HOLD", "SELL"],p=[0.3,0.3,0.4])
 		else:
-			responseList[company]="SELL"
+			responseList[company]=np.random.choice(["SELL", "HOLD"],p=[0.7,0.3])
 	return responseList
 
 def standardAgent(companyList):
 	companyDict=json.loads(companyList)
 	responseList={}
 	for company in companyDict:
-		if companyDict[company]["Stability"]>0.5 or companyDict[company]["Hype"]>0.5:
-			responseList[company]="BUY"
-		elif companyDict[company]["Stability"]>0.3 or companyDict[company]["Hype"]>0.3:
-			responseList[company]="HOLD"
+		if companyDict[company]["Good"]>0.5:
+			responseList[company]=np.random.choice(["BUY", "HOLD"],p=[0.7,0.3])
+		elif companyDict[company]["Good"]>0.3:
+			responseList[company]=np.random.choice(["BUY", "HOLD"],p=[0.2,0.8])
+		if companyDict[company]["Bad"]>0.65:
+			responseList[company]=np.random.choice(["SELL", "HOLD", "BUY"],p=[0.7,0.2,0.1])
 		else:
-			responseList[company]="SELL"
+			responseList[company]=np.random.choice(["SELL", "HOLD", "BUY"], p=[0.33, 0.33, 0.34])
 	return responseList
-
 
 def on_message(ws, message):
 
