@@ -23,11 +23,12 @@
         <div class="row d-flex d-md-none h-100">
             <div class="col-12 d-flex flex-column h-100">
                 <div class="flex-grow-1 overflow-auto" v-if="showChatHistory">
+                    <h3 class="">Social Media™</h3>
                     <!-- Chat history -->
                     <div class="chat-history p-3">
                         <div v-for="(post, index) in posts" :key="index">
                             <div class="speech-bubble">
-                                <p><strong>{{ post.poster }}: </strong>{{ post.message }}</p>
+                                <p><strong>{{ post.poster }} tweeted: </strong>{{ post.message }}</p>
                             </div>
                         </div>
                     </div>
@@ -51,10 +52,11 @@
             <!--Chat history-->
             <div class="col-md-2 bg-light border-end d-flex flex-column h-100">
                 <div class="chat-history pt-3 pb-3" style="height: 100%; overflow-y: scroll;">
+                    <h3 class="">Social Media™</h3>
                     <!--Example messages-->
                     <div v-for="(post, index) in posts" :key="index">
                         <div class="speech-bubble">
-                            <p><strong>{{ post.poster }}: </strong>{{ post.message }}</p>
+                            <p><strong>{{ post.poster }}</strong> tweeted: {{ post.message }}</p>
                         </div>
                     </div>
                 </div>
